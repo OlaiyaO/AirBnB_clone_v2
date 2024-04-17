@@ -73,5 +73,5 @@ class DatabaseStorage:
 
     def close(self):
         """Close the database connection."""
-        self.__db_session.close()
+        self.__session.close()
 
