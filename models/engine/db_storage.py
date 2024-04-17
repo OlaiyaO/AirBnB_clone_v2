@@ -14,71 +14,63 @@ from models.amenity import Amenity
 
 
 class DBStorage:
-    """ create tables in environmental"""
+    """Manage SQL Alchemy database."""
     __engine = None
     __session = None
 
     def __init__(self):
-        user = getenv("HBNB_MYSQL_USER")
-        passwd = getenv("HBNB_MYSQL_PWD")
-        db = getenv("HBNB_MYSQL_DB")
-        host = getenv("HBNB_MYSQL_HOST")
-        env = getenv("HBNB_ENV")
+        user_name = getenv("HBNB_MYSQL_USER")
+        password = getenv("HBNB_MYSQL_PWD")
+        db_name = getenv("HBNB_MYSQL_DB")
+        host_name = getenv("HBNB_MYSQL_HOST")
+        env_var = getenv("HBNB_ENV")
 
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                                      .format(user, passwd, host, db),
+                                      .format(user_name, password, host_name, db_name),
                                       pool_pre_ping=True)
 
-        if env == "test":
+        if env_var == "test":
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """returns a dictionary
-        Return:
-            returns a dictionary of __object
-        """
-        dic = {}
+        """Get all objects from database."""
+        obj_dict = {}
         if cls:
             if type(cls) is str:
                 cls = eval(cls)
             query = self.__session.query(cls)
-            for elem in query:
-                key = "{}.{}".format(type(elem).__name__, elem.id)
-                dic[key] = elem
+            for obj in query:
+                key = "{}.{}".format(type(obj).__name__, obj.id)
+                obj_dict[key] = obj
         else:
-            lista = [State, City, User, Place, Review, Amenity]
-            for clase in lista:
-                query = self.__session.query(clase)
-                for elem in query:
-                    key = "{}.{}".format(type(elem).__name__, elem.id)
-                    dic[key] = elem
-        return (dic)
+            class_list = [State, City, User, Place, Review, Amenity]
+            for obj in class_list:
+                query = self.__session.query(obj)
+                for obj in query:
+                    key = "{}.{}".format(type(obj).__name__, obj.id)
+                    obj_dict[key] = obj
+        return (obj_dict)
 
     def new(self, obj):
-        """add a new element in the table
-        """
+        """Add new object to database."""
         self.__session.add(obj)
 
     def save(self):
-        """save changes
-        """
+        """Save changes to the database."""
         self.__session.commit()
 
     def delete(self, obj=None):
-        """delete an element in the table
-        """
+        """Delete an object from the database."""
         if obj:
             self.session.delete(obj)
 
     def reload(self):
-        """configuration
-        """
+        """Reload the database."""
         Base.metadata.create_all(self.__engine)
-        sec = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        Session = scoped_session(sec)
+        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        Session = scoped_session(session_factory)
         self.__session = Session()
 
     def close(self):
-        """ calls remove()
-        """
+        """Close the database connection."""
         self.__session.close()
