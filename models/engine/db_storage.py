@@ -26,13 +26,13 @@ class DatabaseStorage:
         env = getenv("HBNB_ENV")
 
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
-                                         .format(user, passwd, host, database),
+                                         .format(user, password, host, database),
                                          pool_pre_ping=True)
 
         if env == "test":
             Base.metadata.drop_all(self.__engine)
 
-    def get_all(self, cls=None):
+    def all(self, cls=None):
         """Get all objects from database."""
         obj_dict = {}
         if cls:
@@ -51,7 +51,7 @@ class DatabaseStorage:
                     obj_dict[key] = obj
         return obj_dict
 
-    def add(self, obj):
+    def new(self, obj):
         """Add new object to database."""
         self.__session.add(obj)
 
