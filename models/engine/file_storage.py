@@ -4,7 +4,7 @@ import json
 
 
 class FileStorage:
-    """This class manages storage of hbnb models in JSON format"""
+    """Class to manage file storage for the HBNB clone project"""
     __file_path = 'file.json'
     __objects = {}
 
@@ -13,7 +13,7 @@ class FileStorage:
         return FileStorage.__objects
 
     def new(self, obj):
-        """Adds new object to storage dictionary"""
+        """Adds new object to the storage dictionary"""
         self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
 
     def save(self):
@@ -50,19 +50,20 @@ class FileStorage:
             pass
 
     def delete(self, obj=None):
-        """Deletes obj from __objects if it's inside"""
+        """Removes the specified object from storage if it exists"""
         if obj is not None:
             key = obj.__class__.__name__ + '.' + obj.id
             if key in self.__objects:
                 del self.__objects[key]
 
     def all(self, cls=None):
-        """Returns the list of objects of one type of class"""
+        """Returns a dictionary of objects filtered by the specified class"""
         if cls is None:
             return self.__objects
         else:
-            filtered_objects = {}
-            for key, obj in self.__objects.items():
+            filtered_objs = {}
+            for obj_key, obj in self.__objects.items():
                 if isinstance(obj, cls):
-                    filtered_objects[key] = obj
-            return filtered_objects
+                    filtered_objs[obj_key] = obj
+            return filtered_objs
+
