@@ -36,7 +36,7 @@ class DatabaseStorage:
         """Get all objects from database."""
         obj_dict = {}
         if cls:
-            if type(cls) is str:
+            if isinstance(cls, str):
                 cls = eval(cls)
             query = self.__session.query(cls)
             for obj in query:
@@ -74,4 +74,5 @@ class DatabaseStorage:
     def close(self):
         """Close the database connection."""
         self.__session.close()
+        self.__engine.dispose()
 
