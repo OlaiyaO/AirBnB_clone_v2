@@ -14,7 +14,7 @@ class State(BaseModel, Base):
 
     Attributes:
         name (str): The name of the state.
-        cities (relationship): The relationship between the state and its cities.
+        cities (relationship): The relationship between the state and cities.
     """
     __tablename__ = "states"
     name = Column(String(128), nullable=False)

@@ -8,11 +8,11 @@ from models.place import Place
 
 
 class City(BaseModel, Base):
-    """This class represents a city within the HBNB project.
+    """City class for the HBNB project, representing a city.
 
     Attributes:
-        state_id (str): The ID of the state to which the city belongs.
-        name (str): The name of the city.
+        state_id (str): ID of the city's state.
+        name (str): Name of the city.
     """
     __tablename__ = "cities"
     name = Column(String(128), nullable=False)
