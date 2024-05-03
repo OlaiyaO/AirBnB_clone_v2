@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 """
-Fabric script that distributes an archive to web servers using the function do_deploy.
+Fabric script for an archive to web servers using the function do_deploy.
 """
-
-
 import os.path
 from fabric.api import env, put, run
 
+
 # Define the list of web server IPs and the SSH username
 env.hosts = ["54.237.115.176", "54.234.13.131"]
+
 def do_deploy(archive_path):
     """Distributes an archive to a web server.
 
@@ -48,4 +48,3 @@ def do_deploy(archive_path):
            format(name)).failed is True:
         return False
     return True
-
