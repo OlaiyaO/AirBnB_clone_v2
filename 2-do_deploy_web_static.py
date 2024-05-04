@@ -1,51 +1,62 @@
 #!/usr/bin/python3
 """
-Fabric script for an archive to web servers using the function do_deploy.
+A Fabric script that distributess an archive to my web servers.
 """
-import os.path
-from fabric.api import env, put, run
+from datetime import datetime
+from fabric.api import *
+import os
 
-
-# Define the list of web server IPs and the SSH username
 env.hosts = ["54.237.115.176", "54.234.13.131"]
+env.user = "ubuntu"
 
+# Change the variable to specify the directory where the archive will be
+ARCHIVE_DIR = "versions"
+
+def do_pack():
+    """
+    Generate a .tgz archive from the contents of the web_static folder.
+
+    Returns:
+        str: The path to the generated archive if successful, None otherwise.
+    """
+    local("mkdir -p {}".format(ARCHIVE_DIR))
+    date = datetime.now().strftime("%Y%m%d%H%M%S")
+    archive_name = "web_static_{}.tgz".format(date)
+    archive_path = "{}/{}".format(ARCHIVE_DIR, archive_name)
+    result = local(
+            "tar -cvzf {} web_static".format(archive_path), capture=True
+            )
+    if result.succeeded:
+        print("Packing successful!")
+        return archive_path
+    else:
+        return None
 
 def do_deploy(archive_path):
-    """Distributes an archive to a web server.
+    """
+    Distribute the .tgz archive to web servers.
 
     Args:
-        archive_path (str): The path of the archive to distribute.
-    Returns:
-        If the file doesn't exist at archive_path or an error occurs - False.
-        Otherwise - True.
-    """
-    if os.path.isfile(archive_path) is False:
-        return False
-    file = archive_path.split("/")[-1]
-    name = file.split(".")[0]
+        archive_path (str): The path to the .tgz archive to deploy.
 
-    if put(archive_path, "/tmp/{}".format(file)).failed is True:
+    Returns:
+        bool: True if deployment was successful, False otherwise.
+    """
+    if not os.path.exists(archive_path):
         return False
-    if run("rm -rf /data/web_static/releases/{}/".
-           format(name)).failed is True:
-        return False
-    if run("mkdir -p /data/web_static/releases/{}/".
-           format(name)).failed is True:
-        return False
-    if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".
-           format(file, name)).failed is True:
-        return False
-    if run("rm /tmp/{}".format(file)).failed is True:
-        return False
-    if run("mv /data/web_static/releases/{}/web_static/* "
-           "/data/web_static/releases/{}/".format(name, name)).failed is True:
-        return False
-    if run("rm -rf /data/web_static/releases/{}/web_static".
-           format(name)).failed is True:
-        return False
-    if run("rm -rf /data/web_static/current").failed is True:
-        return False
-    if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".
-           format(name)).failed is True:
-        return False
+
+    remote_archive_path = "/tmp/{}".format(os.path.basename(archive_path))
+    put(archive_path, "/tmp/")
+    archive_name = os.path.basename(archive_path).split('.')[0]
+    release_path = "/data/web_static/releases/{}/".format(archive_name)
+    run("sudo mkdir -p {}".format(release_path))
+    run("sudo tar -xzf {} -C {}".format(remote_archive_path, release_path))
+    run("sudo rm {}".format(remote_archive_path))
+    run("sudo mv {}web_static/* {}".format(release_path, release_path))
+    run("sudo rm -rf {}web_static".format(release_path))
+    run("sudo rm -rf /data/web_static/current")
+    run("sudo ln -s {} /data/web_static/current".format(release_path))
+
+    print("New version deployed!")
     return True
+
