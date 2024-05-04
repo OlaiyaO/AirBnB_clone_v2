@@ -12,6 +12,7 @@ env.user = "ubuntu"
 # Change the variable to specify the directory where the archive will be
 ARCHIVE_DIR = "versions"
 
+
 def do_pack():
     """
     Generate a .tgz archive from the contents of the web_static folder.
@@ -31,6 +32,7 @@ def do_pack():
         return archive_path
     else:
         return None
+
 
 def do_deploy(archive_path):
     """
@@ -59,4 +61,3 @@ def do_deploy(archive_path):
 
     print("New version deployed!")
     return True
-
