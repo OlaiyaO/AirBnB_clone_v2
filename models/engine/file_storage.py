@@ -66,4 +66,3 @@ class FileStorage:
                 if isinstance(obj, cls):
                     filtered_objs[obj_key] = obj
             return filtered_objs
-
