@@ -19,13 +19,13 @@ def do_pack():
     Returns:
         str: Path to the newly created archive
     """
-    dt = datetime.utcnow()
-    file = "versions/web_static_{}{}{}{}{}{}.tgz".format(dt.year,
-                                                         dt.month,
-                                                         dt.day,
-                                                         dt.hour,
-                                                         dt.minute,
-                                                         dt.second)
+    date = datetime.utcnow()
+    file = "versions/web_static_{}{}{}{}{}{}.tgz".format(date.year,
+                                                         date.month,
+                                                         date.day,
+                                                         date.hour,
+                                                         date.minute,
+                                                         date.second)
     if os.path.isdir("versions") is False:
         if local("mkdir -p versions").failed is True:
             return None
@@ -54,7 +54,7 @@ def do_deploy(archive_path):
     if run("rm -rf /data/web_static/releases/{}/".
            format(name)).failed is True:
         return False
-    if run("mkdir -p /data/web_static/releases/{}/".
+    if run("sudo mkdir -p /data/web_static/releases/{}/".
            format(name)).failed is True:
         return False
     if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".
